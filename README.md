@@ -1,4 +1,4 @@
-#Brandon’s Notes App#
+# Brandon’s Notes App
 
   A full-stack note-taking application built with Node.js, vanilla JavaScript, HTML/CSS, and SQLite.
   This project includes a custom backend API, a persistent SQL database, and a dark-mode responsive UI.
