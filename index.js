@@ -44,9 +44,32 @@ function sendJson(res, statusCode, data){
 }
 
 // Helper to read JSON body from request
-
+function readJsonBody(req, callback){
+    let body = "";
+    req.on('data', (chunk) => {
+        body += chunk.toString();
+    });
+    req.on('end', () => {   
+        if(!body){
+            callback(null, {}); // empty body
+            return;
+        }
+        try{
+            const data = JSON.parse(body);
+            callback(null, data)
+        } catch(err){
+            callback(err);
+        }
+    });
+}
 
 // Create HTTP server
+const server = createServer((req, res) => {
 
+});
 
 // Start the server
+const PORT = 3000;
+server.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+});
