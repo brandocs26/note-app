@@ -4,7 +4,7 @@
   This project includes a custom backend API, a persistent SQL database, and a dark-mode responsive UI.
   Perfect for learning full-stack fundamentals, CRUD operations, REST APIs, and lightweight database integration.
 
-##***Features***
+## ***Features***
 
     Frontend
     
