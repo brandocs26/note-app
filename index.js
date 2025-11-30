@@ -173,15 +173,48 @@ const server = createServer((req, res) => {
     }
 
 
-    // TODO --- GET /notes/:id [single note] ---
+    // --- GET /notes/:id [single note] ---
+    if (req.method === 'GET' && req.url.startsWith('/notes/')) {
+        const idStr = req.url.split('/')[2];
+        const id = Number(idStr);
 
-
+        if (Number.isNaN(id)) {
+            sendJson(res, 400, {
+                error: 'Invalid note ID'
+            });
+            return;
+        }
+        const sql = 'SELECT * FROM notes WHERE id = ?';
+        db.get(sql, [id], (dbErr, row) => {
+            if (dbErr) {
+                console.error('DB error (get):', dbErr);
+                sendJson(res, 500, {
+                    error: 'Database error'
+                });
+                return;
+            }
+            if (!row) {
+                sendJson(res, 404, {
+                    error: `Note ${id} not found`
+                });
+                return;
+            }
+            sendJson(res, 200, {
+                note: row
+            });
+        });
+        return;
+    }
 
     // TODO --- PUT /notes/:id [update note] ---
+    if (req.method === 'PUT' && req.url.startsWith('/notes/')) {
 
+    }
 
     // TODO --- DELETE /notes/:id [delete note] ---
+    if (req.method === 'DELETE' && req.url.startsWith('/notes/')) {
 
+    }
 
     // 404 fallback
     sendJson(res, 404, {error: 'Not found'});
