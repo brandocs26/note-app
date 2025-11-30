@@ -35,7 +35,6 @@ db.run(`
         created_at  TEXT NOT NULL,
         updated_at  TEXT NOT NULL
     )
-        
 `);
 
 // Helper to send JSON responses
@@ -64,9 +63,38 @@ function readJsonBody(req, callback){
     });
 }
 
+// TODO - stopped here
 // Create HTTP server
 const server = createServer((req, res) => {
+    console.log(`${req.method} ${req.url}`);
+    // TODO --- Serve frontend files ---
 
+
+    // TODO --- GET /status ---
+
+
+    // TODO --- GET /hello ---
+
+
+    // TODO --- POST /notes [create note] ---
+
+
+    // TODO --- GET /notes [list all notes] ---
+
+
+
+    // TODO --- GET /notes/:id [single note] ---
+
+
+
+    // TODO --- PUT /notes/:id [update note] ---
+
+
+    // TODO --- DELETE /notes/:id [delete note] ---
+
+
+    // 404 fallback
+    sendJson(res, 404, {error: 'Not found'});
 });
 
 // Start the server
