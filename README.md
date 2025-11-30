@@ -37,6 +37,7 @@ Features
 
             
 Project Structure
+
           note-app/
           │
           ├── index.js              # Node.js backend server (API + static files)
