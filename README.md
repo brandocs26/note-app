@@ -36,7 +36,7 @@
             - updated_at
 
             
-***Project Structure***
+## ***Project Structure***
 
           note-app/
           │
@@ -51,7 +51,7 @@
 
 
 
-***Installation & Setup (Windows)***
+## ***Installation & Setup (Windows)***
 
 1. Clone or download the project
     ```bash
