@@ -5,7 +5,9 @@ Brandon’s Notes App
   Perfect for learning full-stack fundamentals, CRUD operations, REST APIs, and lightweight database integration.
 
 Features
+
     Frontend
+    
         * Clean dark-mode UI
         * Create, edit, and delete notes
         * Real-time updates without page reload
