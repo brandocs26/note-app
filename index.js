@@ -111,8 +111,46 @@ const server = createServer((req, res) => {
     }
 
 
-    // TODO --- POST /notes [create note] ---
-
+    // --- POST /notes [create note] ---
+    if(req.url === '/notes' && req.method === 'POST'){
+        readJsonBody(req, (err, data) => {
+            if(err){
+                sendJson(res, 400, {error: 'Invalid JSON'});
+                return;
+            }
+            const { title, body } = data;
+            if(!title || !body){
+                sendJson(res, 400, {
+                    error: 'Title and body are required'
+                });
+                return;
+            }
+            const now = new Date().toISOString();
+            const sql = `INSERT INTO 
+                        notes (title, body, created_at, updated_at)
+                        VALUES (?, ?, ?, ?)`;
+            db.run(sql, [title, body, now, now], function(dbErr) {
+                if(dbErr){
+                    console.error('DB Error:', dbErr);
+                    sendJson(res, 500, {
+                        error: 'Failed to create note - Database error'
+                    });
+                    return;
+                }
+                sendJson(res, 201, {
+                    message: 'Note created',
+                    note: {
+                        id: this.lastID,
+                        title,
+                        body,
+                        created_at: now,
+                        updated_at: now
+                    }
+                });
+            });
+        });
+        return;
+    }
 
     // TODO --- GET /notes [list all notes] ---
 
