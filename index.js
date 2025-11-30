@@ -102,7 +102,13 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // TODO --- GET /hello ---
+    // --- GET /hello ---
+    if(req.url === '/hello' && req.method === 'GET'){
+        sendJson(res, 200, {
+            message: 'Hello from Brandon Notes API!'
+        });
+        return; 
+    }
 
 
     // TODO --- POST /notes [create note] ---
