@@ -67,7 +67,7 @@ function readJsonBody(req, callback){
 // Create HTTP server
 const server = createServer((req, res) => {
     console.log(`${req.method} ${req.url}`);
-    // TODO --- Serve frontend files ---
+    // --- Serve frontend files ---
     if(req.url === '/' && req.method === 'GET'){
         const filePath = join(__dirname, 'public', 'index.html');
         readFile(filePath, (err, content) => {
@@ -93,8 +93,14 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // TODO --- GET /status ---
-
+    // --- GET /status ---
+    if(req.url === '/status' && req.method === 'GET'){
+        sendJson(res, 200, {
+            status: 'ok',
+            message: 'Brandon Notes API is running'
+        });
+        return;
+    }
 
     // TODO --- GET /hello ---
 
