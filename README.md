@@ -35,7 +35,7 @@ Features
 
             
 Project Structure
-          backend-training/
+          note-app/
           │
           ├── index.js              # Node.js backend server (API + static files)
           ├── notes.db              # SQLite database (auto-created)
@@ -48,14 +48,22 @@ Project Structure
 
 
 
-Installation & Setup
+Installation & Setup (Windows)
 
 1. Clone or download the project
     ```bash
-    git clone <your-repo-url>
-    cd backend-training
+    > git clone https://github.com/brandocs26/note-app.git
+    > cd note-app
     ```
-3. Install dependencies
-4. Start the server
-5. Open the app in your browser
+2. Install dependencies
+   ```bash
+   npm install sqlite3
+   ```
+3. Start the server
+   ```bash
+   node index.js
+   ```
+   You should see:  ```arduino Server running at http://localhost:3000```
+4. Open the app in your browser
+   ```arduino Server running at http://localhost:3000```
 
