@@ -21,6 +21,7 @@
 import { createServer } from "http";
 import { readFile } from "fs";
 import { join } from "path";
+import { send } from "process";
 const sqlite3 = require('sqlite3').verbose();
 
 // --- Setup SQLite database ---
@@ -63,12 +64,34 @@ function readJsonBody(req, callback){
     });
 }
 
-// TODO - stopped here
 // Create HTTP server
 const server = createServer((req, res) => {
     console.log(`${req.method} ${req.url}`);
     // TODO --- Serve frontend files ---
-
+    if(req.url === '/' && req.method === 'GET'){
+        const filePath = join(__dirname, 'public', 'index.html');
+        readFile(filePath, (err, content) => {
+            if(err){
+                sendJson(res, 500, {error: 'Error loading page'});
+                return;
+            }
+            res.writeHead(200, {'Content-Type': 'text/html'});
+            res.end(content);
+        });
+        return;
+    }
+    if(req.url === '/app.js' && req.method === 'GET'){
+        const filePath = join(__dirname, 'public', 'app.js');
+        readFile(filePath, (err, content) => {
+            if(err){
+                sendJson(res, 500, {error: 'Error loading script'});
+                return;
+            }
+            res.writeHead(200, {'Content-Type': 'application/javascript'});
+            res.end(content);
+        });
+        return;
+    }
 
     // TODO --- GET /status ---
 
