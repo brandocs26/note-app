@@ -131,7 +131,7 @@ const server = createServer((req, res) => {
                         VALUES (?, ?, ?, ?)`;
             db.run(sql, [title, body, now, now], function(dbErr) {
                 if(dbErr){
-                    console.error('DB Error:', dbErr);
+                    console.error('DB Error (insert):', dbErr);
                     sendJson(res, 500, {
                         error: 'Failed to create note - Database error'
                     });
@@ -152,8 +152,25 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // TODO --- GET /notes [list all notes] ---
-
+    // --- GET /notes [list all notes] ---
+    if(req.url === '/notes' && req.method === 'GET'){
+        const sql = `SELECT * FROM notes 
+                    ORDER BY created_at 
+                    DESC`;
+        db.all(sql, [], (dbErr, rows) => {
+            if(dbErr){
+                console.error('DB Error (select):', dbErr);
+                sendJson(res, 500, {
+                    error: 'Failed to retrieve notes - Database error'
+                });
+                return;
+            }
+            sendJson(res, 200, {
+                notes: rows
+            });
+        });
+        return;
+    }
 
 
     // TODO --- GET /notes/:id [single note] ---
