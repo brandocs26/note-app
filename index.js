@@ -35,6 +35,7 @@ db.run(`
         created_at  TEXT NOT NULL,
         updated_at  TEXT NOT NULL
     )
+        
 `);
 
 // Helper to send JSON responses
