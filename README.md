@@ -57,15 +57,15 @@ Installation & Setup (Windows)
     ```
 2. Install dependencies
    ```bash
-   npm install sqlite3
+   > npm install sqlite3
    ```
 3. Start the server
    ```bash
-   node index.js
+   > node index.js
    ```
    You should see:  ```Server running at http://localhost:3000```
 4. Open the app in your browser
    ```
-   Server running at http://localhost:3000
+   http://localhost:3000
    ```
 
