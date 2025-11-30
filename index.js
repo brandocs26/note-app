@@ -208,7 +208,56 @@ const server = createServer((req, res) => {
 
     // TODO --- PUT /notes/:id [update note] ---
     if (req.method === 'PUT' && req.url.startsWith('/notes/')) {
-
+        const idStr = req.url.split('/')[2];
+        const id = Number(idStr);
+        if (Number.isNaN(id)) {
+            sendJson(res, 400, {
+                error: 'Invalid note ID'
+            });
+            return;
+        }
+        readJsonBody(req, (err, data) => {
+            if (err) {
+                sendJson(res, 400, {
+                    error: 'Invalid JSON'
+                });
+                return;
+            }
+            const { title, body } = data;
+            if (!title || !body) {
+                sendJson(res, 400, {
+                    error: 'Title and body are required'
+                });
+                return;
+            }
+            const now = new Date().toISOString();
+            const sql = `UPDATE notes SET title = ?, body = ?, updated_at = ? WHERE id = ?`;
+            db.run(sql, [title, body, now, id], function(dbErr) {
+                if (dbErr) {
+                    console.error('DB Error (update):', dbErr);
+                    sendJson(res, 500, {
+                        error: 'Failed to update note - Database error'
+                    });
+                    return;
+                }
+                if (this.changes === 0) {
+                    sendJson(res, 404, {
+                        error: `Note ${id} not found`
+                    });
+                    return;
+                }
+                sendJson(res, 200, {
+                    message: `Note ${id} updated`,
+                    note: {
+                        id,
+                        title,
+                        body,
+                        updated_at: now
+                    }
+                });
+            });
+        });
+        return;
     }
 
     // TODO --- DELETE /notes/:id [delete note] ---
