@@ -54,6 +54,7 @@
 ## ***Installation & Setup (Windows)***
 
 **1. Clone or download the project**
+
     ```bash
     > git clone https://github.com/brandocs26/note-app.git
     > cd note-app
