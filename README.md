@@ -63,7 +63,9 @@ Installation & Setup (Windows)
    ```bash
    node index.js
    ```
-   You should see:  ```arduino Server running at http://localhost:3000```
+   You should see:  ```Server running at http://localhost:3000```
 4. Open the app in your browser
-   ```arduino Server running at http://localhost:3000```
+   ```
+   Server running at http://localhost:3000
+   ```
 
