@@ -4,7 +4,7 @@ Brandon’s Notes App
   This project includes a custom backend API, a persistent SQL database, and a dark-mode responsive UI.
   Perfect for learning full-stack fundamentals, CRUD operations, REST APIs, and lightweight database integration.
 
-Features
+***Features***
 
     Frontend
     
@@ -36,7 +36,7 @@ Features
             - updated_at
 
             
-Project Structure
+***Project Structure***
 
           note-app/
           │
@@ -51,7 +51,7 @@ Project Structure
 
 
 
-Installation & Setup (Windows)
+***Installation & Setup (Windows)***
 
 1. Clone or download the project
     ```bash
