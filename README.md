@@ -53,21 +53,21 @@
 
 ## ***Installation & Setup (Windows)***
 
-1. Clone or download the project
+**1. Clone or download the project**
     ```bash
     > git clone https://github.com/brandocs26/note-app.git
     > cd note-app
     ```
-2. Install dependencies
+**2. Install dependencies**
    ```bash
    > npm install sqlite3
    ```
-3. Start the server
+**3. Start the server**
    ```bash
    > node index.js
    ```
    You should see:  ```Server running at http://localhost:3000```
-4. Open the app in your browser
+**4. Open the app in your browser**
    ```
    http://localhost:3000
    ```
