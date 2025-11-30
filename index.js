@@ -18,10 +18,9 @@
       DELETE    /notes/:id      -> delete a note
 */
 
-import { createServer } from "http";
-import { readFile } from "fs";
-import { join } from "path";
-import { send } from "process";
+const http = require('http');
+const { readFile } = require('fs');
+const { join } = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 // --- Setup SQLite database ---
@@ -65,36 +64,37 @@ function readJsonBody(req, callback){
 }
 
 // Create HTTP server
-const server = createServer((req, res) => {
+const server = http.createServer((req, res) => {
     console.log(`${req.method} ${req.url}`);
-    // --- Serve frontend files ---
-    if(req.url === '/' && req.method === 'GET'){
+    // ----------- Serve frontend files -----------
+    if (req.url === '/' && req.method === 'GET') {
         const filePath = join(__dirname, 'public', 'index.html');
         readFile(filePath, (err, content) => {
-            if(err){
-                sendJson(res, 500, {error: 'Error loading page'});
+            if (err) {
+                sendJson(res, 500, { error: 'Error loading page' });
                 return;
             }
-            res.writeHead(200, {'Content-Type': 'text/html'});
-            res.end(content);
-        });
-        return;
-    }
-    if(req.url === '/app.js' && req.method === 'GET'){
-        const filePath = join(__dirname, 'public', 'app.js');
-        readFile(filePath, (err, content) => {
-            if(err){
-                sendJson(res, 500, {error: 'Error loading script'});
-                return;
-            }
-            res.writeHead(200, {'Content-Type': 'application/javascript'});
+            res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(content);
         });
         return;
     }
 
-    // --- GET /status ---
-    if(req.url === '/status' && req.method === 'GET'){
+    if (req.url === '/app.js' && req.method === 'GET') {
+        const filePath = join(__dirname, 'public', 'app.js');
+        readFile(filePath, (err, content) => {
+            if (err) {
+                sendJson(res, 500, { error: 'Error loading script' });
+                return;
+            }
+            res.writeHead(200, { 'Content-Type': 'application/javascript' });
+            res.end(content);
+        });
+        return;
+    }
+
+    // ----------- GET /status ----------------
+    if (req.url === '/status' && req.method === 'GET') {
         sendJson(res, 200, {
             status: 'ok',
             message: 'Brandon Notes API is running'
@@ -102,41 +102,38 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // --- GET /hello ---
-    if(req.url === '/hello' && req.method === 'GET'){
-        sendJson(res, 200, {
-            message: 'Hello from Brandon Notes API!'
-        });
-        return; 
+    // ----------- GET /hello ----------------
+    if (req.url === '/hello' && req.method === 'GET') {
+        sendJson(res, 200, { message: 'Hello Brandon!' });
+        return;
     }
 
-
-    // --- POST /notes [create note] ---
-    if(req.url === '/notes' && req.method === 'POST'){
+    // ----------- POST /notes (create note) --------
+    if (req.method === 'POST' && req.url === '/notes') {
         readJsonBody(req, (err, data) => {
-            if(err){
-                sendJson(res, 400, {error: 'Invalid JSON'});
+            if (err) {
+                sendJson(res, 400, { error: 'Invalid JSON' });
                 return;
             }
+
             const { title, body } = data;
-            if(!title || !body){
-                sendJson(res, 400, {
-                    error: 'Title and body are required'
-                });
+
+            if (!title || !body) {
+                sendJson(res, 400, { error: 'Note must have "title" and "body"' });
                 return;
             }
+
             const now = new Date().toISOString();
-            const sql = `INSERT INTO 
-                        notes (title, body, created_at, updated_at)
-                        VALUES (?, ?, ?, ?)`;
-            db.run(sql, [title, body, now, now], function(dbErr) {
-                if(dbErr){
-                    console.error('DB Error (insert):', dbErr);
-                    sendJson(res, 500, {
-                        error: 'Failed to create note - Database error'
-                    });
+            const sql =
+                'INSERT INTO notes (title, body, created_at, updated_at) VALUES (?, ?, ?, ?)';
+
+            db.run(sql, [title, body, now, now], function (dbErr) {
+                if (dbErr) {
+                    console.error('DB error (insert):', dbErr);
+                    sendJson(res, 500, { error: 'Database error' });
                     return;
                 }
+
                 sendJson(res, 201, {
                     message: 'Note created',
                     note: {
@@ -152,148 +149,132 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // --- GET /notes [list all notes] ---
-    if(req.url === '/notes' && req.method === 'GET'){
-        const sql = `SELECT * FROM notes 
-                    ORDER BY created_at 
-                    DESC`;
+    // ----------- GET /notes (list all notes) -----------
+    if (req.method === 'GET' && req.url === '/notes') {
+        const sql =
+            'SELECT id, title, body, created_at, updated_at FROM notes ORDER BY created_at DESC';
+
         db.all(sql, [], (dbErr, rows) => {
-            if(dbErr){
-                console.error('DB Error (select):', dbErr);
-                sendJson(res, 500, {
-                    error: 'Failed to retrieve notes - Database error'
-                });
+            if (dbErr) {
+                console.error('DB error (select):', dbErr);
+                sendJson(res, 500, { error: 'Database error' });
                 return;
             }
-            sendJson(res, 200, {
-                notes: rows
-            });
+
+            sendJson(res, 200, { notes: rows });
         });
         return;
     }
 
-
-    // --- GET /notes/:id [single note] ---
+    // ----------- GET /notes/:id (single note) -----------
     if (req.method === 'GET' && req.url.startsWith('/notes/')) {
         const idStr = req.url.split('/')[2];
         const id = Number(idStr);
 
         if (Number.isNaN(id)) {
-            sendJson(res, 400, {
-                error: 'Invalid note ID'
-            });
+            sendJson(res, 400, { error: 'Invalid note ID' });
             return;
         }
-        const sql = 'SELECT * FROM notes WHERE id = ?';
+
+        const sql =
+            'SELECT id, title, body, created_at, updated_at FROM notes WHERE id = ?';
+
         db.get(sql, [id], (dbErr, row) => {
             if (dbErr) {
                 console.error('DB error (get):', dbErr);
-                sendJson(res, 500, {
-                    error: 'Database error'
-                });
+                sendJson(res, 500, { error: 'Database error' });
                 return;
             }
+
             if (!row) {
-                sendJson(res, 404, {
-                    error: `Note ${id} not found`
-                });
+                sendJson(res, 404, { error: `Note ${id} not found` });
                 return;
             }
-            sendJson(res, 200, {
-                note: row
-            });
+
+            sendJson(res, 200, { note: row });
         });
         return;
     }
 
-    // --- PUT /notes/:id [update note] ---
+    // ----------- PUT /notes/:id (update note) -----------
     if (req.method === 'PUT' && req.url.startsWith('/notes/')) {
         const idStr = req.url.split('/')[2];
         const id = Number(idStr);
+
         if (Number.isNaN(id)) {
-            sendJson(res, 400, {
-                error: 'Invalid note ID'
-            });
+            sendJson(res, 400, { error: 'Invalid note ID' });
             return;
         }
+
         readJsonBody(req, (err, data) => {
             if (err) {
-                sendJson(res, 400, {
-                    error: 'Invalid JSON'
-                });
+                sendJson(res, 400, { error: 'Invalid JSON' });
                 return;
             }
+
             const { title, body } = data;
+
             if (!title || !body) {
-                sendJson(res, 400, {
-                    error: 'Title and body are required'
-                });
+                sendJson(res, 400, { error: 'Note must have "title" and "body"' });
                 return;
             }
+
             const now = new Date().toISOString();
-            const sql = `UPDATE notes SET title = ?, body = ?, updated_at = ? WHERE id = ?`;
-            db.run(sql, [title, body, now, id], function(dbErr) {
+            const sql =
+                'UPDATE notes SET title = ?, body = ?, updated_at = ? WHERE id = ?';
+
+            db.run(sql, [title, body, now, id], function (dbErr) {
                 if (dbErr) {
-                    console.error('DB Error (update):', dbErr);
-                    sendJson(res, 500, {
-                        error: 'Failed to update note - Database error'
-                    });
+                    console.error('DB error (update):', dbErr);
+                    sendJson(res, 500, { error: 'Database error' });
                     return;
                 }
+
                 if (this.changes === 0) {
-                    sendJson(res, 404, {
-                        error: `Note ${id} not found`
-                    });
+                    sendJson(res, 404, { error: `Note ${id} not found` });
                     return;
                 }
+
                 sendJson(res, 200, {
                     message: `Note ${id} updated`,
-                    note: {
-                        id,
-                        title,
-                        body,
-                        updated_at: now
-                    }
+                    note: { id, title, body, updated_at: now }
                 });
             });
         });
         return;
     }
 
-    // --- DELETE /notes/:id [delete note] ---
+    // ----------- DELETE /notes/:id ----------------
     if (req.method === 'DELETE' && req.url.startsWith('/notes/')) {
         const idStr = req.url.split('/')[2];
         const id = Number(idStr);
+
         if (Number.isNaN(id)) {
-            sendJson(res, 400, {
-                error: 'Invalid note ID'
-            });
+            sendJson(res, 400, { error: 'Invalid note ID' });
             return;
         }
-        const sql = `DELETE FROM notes WHERE id = ?`;
-        db.run(sql, [id], function(dbErr) {
+
+        const sql = 'DELETE FROM notes WHERE id = ?';
+
+        db.run(sql, [id], function (dbErr) {
             if (dbErr) {
-                console.error('DB Error (delete):', dbErr);
-                sendJson(res, 500, {
-                    error: 'Failed to delete note - Database error'
-                });
+                console.error('DB error (delete):', dbErr);
+                sendJson(res, 500, { error: 'Database error' });
                 return;
             }
+
             if (this.changes === 0) {
-                sendJson(res, 404, {
-                    error: `Note ${id} not found`
-                });
+                sendJson(res, 404, { error: `Note ${id} not found` });
                 return;
             }
-            sendJson(res, 200, {
-                message: `Note ${id} deleted`
-            });
+
+            sendJson(res, 200, { message: `Note ${id} deleted` });
         });
         return;
     }
 
-    // 404 fallback
-    sendJson(res, 404, {error: 'Not found'});
+    // ----------- 404 fallback ----------------
+    sendJson(res, 404, { error: 'Not found' });
 });
 
 // Start the server
