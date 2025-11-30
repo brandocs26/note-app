@@ -206,7 +206,7 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // TODO --- PUT /notes/:id [update note] ---
+    // --- PUT /notes/:id [update note] ---
     if (req.method === 'PUT' && req.url.startsWith('/notes/')) {
         const idStr = req.url.split('/')[2];
         const id = Number(idStr);
@@ -260,9 +260,36 @@ const server = createServer((req, res) => {
         return;
     }
 
-    // TODO --- DELETE /notes/:id [delete note] ---
+    // --- DELETE /notes/:id [delete note] ---
     if (req.method === 'DELETE' && req.url.startsWith('/notes/')) {
-
+        const idStr = req.url.split('/')[2];
+        const id = Number(idStr);
+        if (Number.isNaN(id)) {
+            sendJson(res, 400, {
+                error: 'Invalid note ID'
+            });
+            return;
+        }
+        const sql = `DELETE FROM notes WHERE id = ?`;
+        db.run(sql, [id], function(dbErr) {
+            if (dbErr) {
+                console.error('DB Error (delete):', dbErr);
+                sendJson(res, 500, {
+                    error: 'Failed to delete note - Database error'
+                });
+                return;
+            }
+            if (this.changes === 0) {
+                sendJson(res, 404, {
+                    error: `Note ${id} not found`
+                });
+                return;
+            }
+            sendJson(res, 200, {
+                message: `Note ${id} deleted`
+            });
+        });
+        return;
     }
 
     // 404 fallback
